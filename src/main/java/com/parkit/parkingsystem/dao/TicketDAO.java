@@ -91,4 +91,19 @@ public class TicketDAO {
     }
     return false;
   }
+
+  public void updateTicketInTime(Ticket ticket) {
+    Connection con = null;
+    try {
+      con = dataBaseConfig.getConnection();
+      PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET_INTIME);
+      ps.setTimestamp(1, Timestamp.from(ticket.getInTime()));
+      ps.execute();
+      System.out.println("Modified in-time is:" + ticket.getInTime());
+    } catch (Exception ex) {
+      logger.error("Error saving ticket info", ex);
+    } finally {
+      dataBaseConfig.closeConnection(con);
+    }
+  }
 }
