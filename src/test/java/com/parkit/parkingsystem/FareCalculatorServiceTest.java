@@ -114,6 +114,22 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  public void calculateFareCarWithLessThanOneHourParkingTimeWithDiscount() {
+    Instant inTime = Instant.now();
+    inTime = inTime.plusMillis(-(45 * 60 * 1000));// 45 minutes parking time
+    // should give 3/4th
+    // parking fare
+    Instant outTime = Instant.now();
+    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+    ticket.setPrice(0.95); // 5% Discount
+    ticket.setInTime(inTime);
+    ticket.setOutTime(outTime);
+    ticket.setParkingSpot(parkingSpot);
+    fareCalculatorService.calculateFare(ticket);
+    assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR * 0.95), ticket.getPrice());
+  }
+
+  @Test
   public void calculateFareCarWithMoreThanADayParkingTime() {
     Instant inTime = Instant.now();
     inTime = inTime.plusMillis(-(24 * 60 * 60 * 1000));// 24 hours parking
