@@ -69,9 +69,32 @@ public class ParkingDataBaseIT {
 
   @Test
   // test Exiting A Car after 1 hour;
-  public void testParkingLotExit() {
+  public void testParkingLotExitWithNoDiscount() throws Exception {
     ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
+    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("inexistant");
+    parkingService.processIncomingVehicle();
+    Ticket ticket = ticketDAO.getTicket("inexistant");
+    ticket.setInTime(Instant.now().plusMillis(-60 * 60 * 1000));
+    ticketDAO.updateTicketInTime(ticket);
+
+    parkingService.processExitingVehicle();
+
+    ticket = ticketDAO.getTicket("inexistant"); // With no discount "inexistant"
+    long duration = Duration.between(ticket.getOutTime(), Instant.now()).toMinutes();
+    assertEquals(duration, 0);
+    assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 1, 0.05);
+    // ajouté une marge d'erreur correspondant à 1 minute.
+
+    // TODO: check that the fare generated and out time are populated correctly in the database
+  }
+
+  @Test
+  // test Exiting A Car after 1 hour;
+  public void testParkingLotExitWithDiscount() throws Exception {
+    ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+    // when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
     parkingService.processIncomingVehicle();
     Ticket ticket = ticketDAO.getTicket("ABCDEF");
     ticket.setInTime(Instant.now().plusMillis(-60 * 60 * 1000));
@@ -79,10 +102,10 @@ public class ParkingDataBaseIT {
 
     parkingService.processExitingVehicle();
 
-    ticket = ticketDAO.getTicket("ABCDEF");
+    ticket = ticketDAO.getTicket("ABCDEF"); // With 5% discount "ABCDEF"
     long duration = Duration.between(ticket.getOutTime(), Instant.now()).toMinutes();
     assertEquals(duration, 0);
-    assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR, 0.05);
+    assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 0.95, 0.05);
     // ajouté une marge d'erreur correspondant à 1 minute.
 
     // TODO: check that the fare generated and out time are populated correctly in the database

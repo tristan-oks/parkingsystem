@@ -6,7 +6,7 @@ import com.parkit.parkingsystem.service.DiscountCalculatorService;
 
 
 // @ExtendWith(MockitoExtension.class)
-public class CalculateDiscountTest {
+public class DiscountCalculatorServiceTest {
 
   // @Mock
   // private static TicketDAO ticketDAO;

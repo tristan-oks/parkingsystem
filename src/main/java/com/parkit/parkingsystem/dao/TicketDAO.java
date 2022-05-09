@@ -11,6 +11,7 @@ import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.DiscountCalculatorService;
 
 public class TicketDAO {
 
@@ -21,13 +22,15 @@ public class TicketDAO {
   public boolean saveTicket(Ticket ticket) {
     Connection con = null;
     try {
+      DiscountCalculatorService discount = new DiscountCalculatorService();
       con = dataBaseConfig.getConnection();
       PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
       // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
       // ps.setInt(1,ticket.getId());
       ps.setInt(1, ticket.getParkingSpot().getId());
       ps.setString(2, ticket.getVehicleRegNumber());
-      ps.setDouble(3, ticket.getPrice());
+      ps.setDouble(3, discount.calculate(ticket.getVehicleRegNumber())); // when incoming, store
+                                                                         // discount in Price
       ps.setTimestamp(4, Timestamp.from(ticket.getInTime()));
       ps.setTimestamp(5,
           (ticket.getOutTime() == null) ? null : (Timestamp.from(ticket.getOutTime())));
