@@ -101,9 +101,30 @@ public class TicketDAO {
       ps.execute();
       System.out.println("Modified in-time is:" + ticket.getInTime());
     } catch (Exception ex) {
-      logger.error("Error saving ticket info", ex);
+      logger.error("Error updating ticket info", ex);
     } finally {
       dataBaseConfig.closeConnection(con);
     }
+  }
+
+  public boolean searchVehicleRegNumber(String vehicleRegNumber) {
+    Connection con = null;
+    try {
+      con = dataBaseConfig.getConnection();
+      PreparedStatement ps = con.prepareStatement(DBConstants.SEARCH_VEHICLE_REG_NUMBER);
+      ps.setString(1, vehicleRegNumber);
+      ResultSet rs = ps.executeQuery();
+      if (rs.next()) {
+        System.out.println("Vehicle with RegNumber " + vehicleRegNumber + " Found!");
+        return true;
+      }
+    } catch (Exception ex) {
+      logger.error("Error searching Ticket by vehicleRegnumber", ex);
+
+    } finally {
+      dataBaseConfig.closeConnection(con);
+    }
+    System.out.println("Vehicle with RegNumber " + vehicleRegNumber + " Not Found!");
+    return false;
   }
 }
