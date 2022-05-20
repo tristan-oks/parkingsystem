@@ -7,7 +7,7 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-  public void calculateFare(Ticket ticket) {
+  public void calculateFare(Ticket ticket, double discount) {
     if ((ticket.getOutTime() == null) || (ticket.getOutTime().isBefore(ticket.getInTime()))) {
       throw new IllegalArgumentException(
           "Out time provided is incorrect:" + ticket.getOutTime().toString());
@@ -15,7 +15,7 @@ public class FareCalculatorService {
 
     Instant inHour = ticket.getInTime();
     Instant outHour = ticket.getOutTime();
-    double discount = ticket.getPrice(); // get back discount rate to calculate the fare
+    // double discount = ticket.getPrice(); // get back discount rate to calculate the fare
     long duration = Duration.between(inHour, outHour).toMinutes();
 
     if (duration < 31) {
@@ -35,5 +35,9 @@ public class FareCalculatorService {
       default:
         throw new IllegalArgumentException("Unkown Parking Type");
     }
+  }
+
+  public void calculateFare(Ticket ticket) {
+    calculateFare(ticket, 1);
   }
 }

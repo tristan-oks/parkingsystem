@@ -13,10 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
+import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
@@ -61,6 +63,8 @@ public class ParkingDataBaseIT {
 
     Ticket ticket = ticketDAO.getTicket("ABCDEF");
     assertThat(ticket.getVehicleRegNumber()).isEqualTo("ABCDEF");
+    int nextSlot = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
+    assertThat(ticket.getParkingSpot().getId()).isNotEqualTo(nextSlot);
     assertThat(ticket.getParkingSpot().isAvailable()).isEqualTo(false);
 
     // TODO: check that a ticket is actually saved in DB and Parking table is updated with
@@ -68,19 +72,18 @@ public class ParkingDataBaseIT {
   }
 
   @Test
-  // test Exiting A Car after 1 hour;
+  // test Exiting A Car after 1 hour with no discount;
   public void testParkingLotExitWithNoDiscount() throws Exception {
     ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
-    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("inexistant");
     parkingService.processIncomingVehicle();
-    Ticket ticket = ticketDAO.getTicket("inexistant");
+    Ticket ticket = ticketDAO.getTicket("ABCDEF");
     ticket.setInTime(Instant.now().plusMillis(-60 * 60 * 1000));
     ticketDAO.updateTicketInTime(ticket);
 
     parkingService.processExitingVehicle();
 
-    ticket = ticketDAO.getTicket("inexistant"); // With no discount "inexistant"
+    ticket = ticketDAO.getTicket("ABCDEF"); // With no discount
     long duration = Duration.between(ticket.getOutTime(), Instant.now()).toMinutes();
     assertEquals(duration, 0);
     assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 1, 0.05);
@@ -90,11 +93,18 @@ public class ParkingDataBaseIT {
   }
 
   @Test
-  // test Exiting A Car after 1 hour;
+  // test Exiting A Car after 1 hour with discount;
   public void testParkingLotExitWithDiscount() throws Exception {
     ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
-    // when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+    Ticket oldTicket = new Ticket();
+    oldTicket.setInTime(Instant.now());
+    oldTicket.setOutTime(Instant.now());
+    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, true);
+    oldTicket.setParkingSpot(parkingSpot);
+    oldTicket.setVehicleRegNumber("ABCDEF");
+    ticketDAO.saveTicket(oldTicket); // create an old ticket to become recurrent user
+
     parkingService.processIncomingVehicle();
     Ticket ticket = ticketDAO.getTicket("ABCDEF");
     ticket.setInTime(Instant.now().plusMillis(-60 * 60 * 1000));

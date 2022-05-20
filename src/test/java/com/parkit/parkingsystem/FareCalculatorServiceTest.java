@@ -33,7 +33,7 @@ public class FareCalculatorServiceTest {
     inTime = inTime.plusMillis(-(60 * 60 * 1000));
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -42,12 +42,26 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  public void calculateFareCarWithDiscount() {
+    Instant inTime = Instant.now();
+    inTime = inTime.plusMillis(-(60 * 60 * 1000));
+    Instant outTime = Instant.now();
+    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+
+    ticket.setInTime(inTime);
+    ticket.setOutTime(outTime);
+    ticket.setParkingSpot(parkingSpot);
+    fareCalculatorService.calculateFare(ticket, 0.95);
+    assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 0.95);
+  }
+
+  @Test
   public void calculateFareBike() {
     Instant inTime = Instant.now();
     inTime = inTime.plusMillis(-(60 * 60 * 1000));
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -56,12 +70,26 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  public void calculateFareBikeWithDiscount() {
+    Instant inTime = Instant.now();
+    inTime = inTime.plusMillis(-(60 * 60 * 1000));
+    Instant outTime = Instant.now();
+    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
+
+    ticket.setInTime(inTime);
+    ticket.setOutTime(outTime);
+    ticket.setParkingSpot(parkingSpot);
+    fareCalculatorService.calculateFare(ticket, 0.95);
+    assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR * 0.95);
+  }
+
+  @Test
   public void calculateFareUnkownType() {
     Instant inTime = Instant.now();
     inTime = inTime.plusMillis(-60 * 60 * 1000);
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, null, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -74,7 +102,7 @@ public class FareCalculatorServiceTest {
     inTime = inTime.plusMillis(60 * 60 * 1000);
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -89,7 +117,7 @@ public class FareCalculatorServiceTest {
     // parking fare
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -105,28 +133,12 @@ public class FareCalculatorServiceTest {
     // parking fare
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
     fareCalculatorService.calculateFare(ticket);
     assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());
-  }
-
-  @Test
-  public void calculateFareCarWithLessThanOneHourParkingTimeWithDiscount() {
-    Instant inTime = Instant.now();
-    inTime = inTime.plusMillis(-(45 * 60 * 1000));// 45 minutes parking time
-    // should give 3/4th
-    // parking fare
-    Instant outTime = Instant.now();
-    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-    ticket.setPrice(0.95); // 5% Discount
-    ticket.setInTime(inTime);
-    ticket.setOutTime(outTime);
-    ticket.setParkingSpot(parkingSpot);
-    fareCalculatorService.calculateFare(ticket);
-    assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR * 0.95), ticket.getPrice());
   }
 
   @Test
@@ -138,7 +150,7 @@ public class FareCalculatorServiceTest {
     // per hour
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
@@ -154,7 +166,7 @@ public class FareCalculatorServiceTest {
     // parking fare
     Instant outTime = Instant.now();
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-    ticket.setPrice(1); // no Discount
+
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
