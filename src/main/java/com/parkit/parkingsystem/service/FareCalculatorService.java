@@ -12,18 +12,13 @@ public class FareCalculatorService {
       throw new IllegalArgumentException(
           "Out time provided is incorrect:" + ticket.getOutTime().toString());
     }
-
     Instant inHour = ticket.getInTime();
     Instant outHour = ticket.getOutTime();
-    // double discount = ticket.getPrice(); // get back discount rate to calculate the fare
     long duration = Duration.between(inHour, outHour).toMinutes();
-
     if (duration < 31) {
       duration = 0;
     }
-    switch (ticket.getParkingSpot().getParkingType())
-
-    {
+    switch (ticket.getParkingSpot().getParkingType()) {
       case CAR: {
         ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR / 60 * discount);
         break;

@@ -51,9 +51,7 @@ public class ParkingDataBaseIT {
   }
 
   @AfterAll
-  private static void tearDown() {
-
-  }
+  private static void tearDown() {}
 
   @Test
   // test Parking A Car;
@@ -66,9 +64,6 @@ public class ParkingDataBaseIT {
     int nextSlot = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
     assertThat(ticket.getParkingSpot().getId()).isNotEqualTo(nextSlot);
     assertThat(ticket.getParkingSpot().isAvailable()).isEqualTo(false);
-
-    // TODO: check that a ticket is actually saved in DB and Parking table is updated with
-    // availability
   }
 
   @Test
@@ -82,14 +77,11 @@ public class ParkingDataBaseIT {
     ticketDAO.updateTicketInTime(ticket);
 
     parkingService.processExitingVehicle();
-
     ticket = ticketDAO.getTicket("ABCDEF"); // With no discount
     long duration = Duration.between(ticket.getOutTime(), Instant.now()).toMinutes();
     assertEquals(duration, 0);
     assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 1, 0.05);
-    // ajouté une marge d'erreur correspondant à 1 minute.
-
-    // TODO: check that the fare generated and out time are populated correctly in the database
+    // added 1 minute marging
   }
 
   @Test
@@ -111,14 +103,10 @@ public class ParkingDataBaseIT {
     ticketDAO.updateTicketInTime(ticket);
 
     parkingService.processExitingVehicle();
-
-    ticket = ticketDAO.getTicket("ABCDEF"); // With 5% discount "ABCDEF"
+    ticket = ticketDAO.getTicket("ABCDEF"); // With 5% discount
     long duration = Duration.between(ticket.getOutTime(), Instant.now()).toMinutes();
     assertEquals(duration, 0);
     assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 0.95, 0.05);
-    // ajouté une marge d'erreur correspondant à 1 minute.
-
-    // TODO: check that the fare generated and out time are populated correctly in the database
+    // added 1 minute marging
   }
-
 }

@@ -101,7 +101,6 @@ public class TicketDAO {
       PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET_INTIME);
       ps.setTimestamp(1, Timestamp.from(ticket.getInTime()));
       ps.execute();
-      System.out.println("Modified in-time is:" + ticket.getInTime());
     } catch (Exception ex) {
       logger.error("Error updating ticket info", ex);
     } finally {
@@ -117,8 +116,7 @@ public class TicketDAO {
       ps.setString(1, vehicleRegNumber);
       ResultSet rs = ps.executeQuery();
       if (rs.next()) {
-        System.out.println("Vehicle with RegNumber " + vehicleRegNumber + " Found!");
-        return true;
+        return true; // vehicle found in database, discount will apply
       }
     } catch (Exception ex) {
       logger.error("Error searching Ticket by vehicleRegnumber", ex);
@@ -126,7 +124,6 @@ public class TicketDAO {
     } finally {
       dataBaseConfig.closeConnection(con);
     }
-    System.out.println("Vehicle with RegNumber " + vehicleRegNumber + " Not Found!");
-    return false;
+    return false; // vehicle not found in database, discount will not apply
   }
 }
